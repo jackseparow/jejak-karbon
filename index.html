@@ -2,118 +2,112 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Si Yo: Kalkulator Hutang Karbon</title>
+    <title>Si Yo: Penjaga Jejak Karbon</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        #main-container { display: flex; gap: 20px; width: 100%; max-width: 1400px; margin-top: 10px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f7f4; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #main-container { display: flex; gap: 20px; width: 100%; max-width: 1300px; margin-top: 10px; }
+        #blocklyDiv { height: 700px; flex: 2; border: 3px solid #27ae60; border-radius: 12px; background: white; }
+        #sidebar { flex: 1; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 8px solid #27ae60; }
         
-        /* Area Kerja */
-        #blocklyDiv { height: 650px; flex: 2; border: 3px solid #2ecc71; border-radius: 12px; background: white; }
+        .monitor { margin-bottom: 15px; padding: 15px; border-radius: 10px; border: 2px solid #eee; }
+        .debt-box { border-color: #e74c3c; background: #fff5f5; }
+        .pay-box { border-color: #2ecc71; background: #f0fff4; }
+        .total-box { border-color: #3498db; background: #ebf8ff; font-size: 1.3em; font-weight: bold; }
         
-        /* Dashboard Hutang Karbon */
-        #sidebar { flex: 1.2; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 8px solid #e74c3c; }
-        
-        .stat-card { background: #fff5f5; border: 2px solid #feb2b2; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
-        .stat-card.green { background: #f0fff4; border-color: #9ae6b4; }
-        
-        #balance-box { font-size: 1.5em; font-weight: bold; padding: 20px; border-radius: 12px; margin-top: 15px; transition: 0.5s; }
-        .debt { background: #fff5f5; color: #c53030; border: 2px solid #fc8181; }
-        .paid { background: #f0fff4; color: #2f855a; border: 2px solid #68d391; }
-
-        .visual-area { width: 100%; height: 200px; background: #edf2f7; border-radius: 12px; position: relative; margin-top: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 50px; }
-        
-        button { background: #4a5568; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        .val { font-size: 1.5em; display: block; margin-top: 5px; }
+        button { background: #34495e; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <h2>🛡️ Si Yo: Penjaga Jejak Karbon</h2>
-    <p>Hitung emisi perjalananmu dan lunasinya dengan menanam pohon!</p>
+    <h2>🛡️ Si Yo: Kalkulator Jejak Karbon</h2>
+    <p>Gunakan mekanisme sarang (nested) untuk menghitung hutang dan pelunasan karbon!</p>
 
     <div id="main-container">
         <div id="blocklyDiv"></div>
 
         <div id="sidebar">
-            <div class="stat-card">
-                <small>💨 Total Emisi (Hutang)</small>
-                <div id="debt-val" style="font-size: 1.8em; font-weight: bold; color: #e53e3e;">0 kg CO2</div>
+            <div class="monitor debt-box">
+                <small>💨 TOTAL HUTANG (EMISI)</small>
+                <b id="debt-out" class="val" style="color: #c53030;">0 kg CO2</b>
             </div>
             
-            <div class="stat-card green">
-                <small>🌳 Penyerapan (Pelunasan)</small>
-                <div id="pay-val" style="font-size: 1.8em; font-weight: bold; color: #38a169;">0 kg CO2</div>
+            <div class="monitor pay-box">
+                <small>🌳 TOTAL PELUNASAN (TANAM)</small>
+                <b id="pay-out" class="val" style="color: #2f855a;">0 kg CO2</b>
             </div>
 
-            <div id="balance-box" class="debt">
-                NERACA: <br> <span id="balance-val">0 kg CO2</span>
-                <div id="status-text" style="font-size: 0.5em; margin-top: 5px;">HUTANG PADA BUMI</div>
+            <div class="monitor total-box" id="balance-style">
+                <small>⚖️ NERACA KARBON</small>
+                <b id="balance-out" class="val">0 kg CO2</b>
+                <span id="status-txt" style="font-size: 0.6em; display: block; margin-top: 5px;">STABIL</span>
             </div>
 
-            <div class="visual-area" id="visual-icon">🌍</div>
-            
-            <button onclick="resetApp()">Mulai Perjalanan Baru</button>
+            <button onclick="workspace.clear(); updateUI();">Bersihkan Papan</button>
         </div>
     </div>
 
     <xml id="toolbox" style="display: none">
-        <category name="1. Perjalanan" colour="0">
-            <block type="transport_trip"></block>
+        <category name="1. Hutang (Emisi)" colour="0">
+            <block type="transport_item"></block>
+            <block type="debt_container"></block>
         </category>
-        <category name="2. Penanaman" colour="120">
-            <block type="planting_action"></block>
+        <category name="2. Pelunasan (Tanam)" colour="120">
+            <block type="tree_item"></block>
+            <block type="pay_container"></block>
         </category>
-        <category name="3. Kalkulator" colour="210">
-            <block type="carbon_balance"></block>
+        <category name="3. Neraca" colour="210">
+            <block type="carbon_balance_nested"></block>
         </category>
     </xml>
 
     <script>
-        // --- 1. DEFINISI BLOK ---
+        // --- 1. DEFINISI BLOK NESTED ---
         Blockly.defineBlocksWithJsonArray([
+          // Item Transportasi
           {
-            "type": "transport_trip",
-            "message0": "Perjalanan: %1 Jarak: %2 km",
+            "type": "transport_item",
+            "message0": "%1 Jarak: %2 km",
             "args0": [
-              {
-                "type": "field_dropdown", "name": "VEHICLE",
-                "options": [
-                  ["✈️ Pesawat Terbang", "0.25"],
-                  ["🚗 Mobil Pribadi", "0.18"],
-                  ["🚆 Kereta Api", "0.04"],
-                  ["🔌 Mobil Listrik", "0.05"],
-                  ["🚌 Bus Umum", "0.08"]
-                ]
-              },
-              { "type": "field_number", "name": "DIST", "value": 100, "min": 0 }
+              { "type": "field_dropdown", "name": "MODE", "options": [["✈️ Pesawat", "0.25"], ["🚗 Mobil", "0.18"], ["🚆 Kereta", "0.04"]] },
+              { "type": "field_number", "name": "DIST", "value": 100 }
             ],
-            "output": "Emission", "colour": 0
+            "previousStatement": null, "nextStatement": null, "colour": 0
           },
+          // Wadah Hutang
           {
-            "type": "planting_action",
-            "message0": "Tanam %1 Luas: %2 Hektar",
+            "type": "debt_container",
+            "message0": "Hutang Karbon Perjalanan: %1 %2",
+            "args0": [{ "type": "input_dummy" }, { "type": "input_statement", "name": "ITEMS" }],
+            "output": "DebtData", "colour": 0
+          },
+          // Item Pohon
+          {
+            "type": "tree_item",
+            "message0": "Tanam %1 Luas: %2 Ha",
             "args0": [
-              {
-                "type": "field_dropdown", "name": "TREE",
-                "options": [
-                  ["🌳 Pohon Munggur (Trembesi)", "28000"], // per hektar/tahun (est)
-                  ["🌽 Jagung", "4000"],
-                  ["🌲 Pinus", "12000"],
-                  ["🌴 Bakau (Mangrove)", "25000"]
-                ]
-              },
-              { "type": "field_number", "name": "AREA", "value": 1, "min": 0 }
+              { "type": "field_dropdown", "name": "TREE", "options": [["🌳 Munggur", "28000"], ["🌽 Jagung", "4000"], ["🌴 Bakau", "25000"]] },
+              { "type": "field_number", "name": "AREA", "value": 1 }
             ],
-            "output": "Sequestration", "colour": 120
+            "previousStatement": null, "nextStatement": null, "colour": 120
           },
+          // Wadah Pelunasan
           {
-            "type": "carbon_balance",
-            "message0": "Kalkulator Karbon %1 Emisi: %2 %3 Penyerapan: %4",
+            "type": "pay_container",
+            "message0": "Pelunasan Tanam Pohon: %1 %2",
+            "args0": [{ "type": "input_dummy" }, { "type": "input_statement", "name": "ITEMS" }],
+            "output": "PayData", "colour": 120
+          },
+          // Blok Neraca (Kalkulator Utama)
+          {
+            "type": "carbon_balance_nested",
+            "message0": "Neraca Si Yo %1 Hutang: %2 %3 Pelunasan: %4",
             "args0": [
               { "type": "input_dummy" },
-              { "type": "input_value", "name": "EMISSION", "check": "Emission" },
+              { "type": "input_value", "name": "DEBT", "check": "DebtData" },
               { "type": "input_dummy" },
-              { "type": "input_value", "name": "FIX", "check": "Sequestration" }
+              { "type": "input_value", "name": "PAY", "check": "PayData" }
             ],
             "colour": 210
           }
@@ -121,77 +115,67 @@
 
         const workspace = Blockly.inject('blocklyDiv', { toolbox: document.getElementById('toolbox'), trashcan: true });
 
-        // --- 2. LOGIKA NUMERASI KARBON ---
-        function calculateCarbon(block) {
-            if (!block) return null;
-            
-            if (block.type === 'carbon_balance') {
-                const eBlock = block.getInputTargetBlock('EMISSION');
-                const fBlock = block.getInputTargetBlock('FIX');
-                
-                let totalDebt = 0;
-                let totalPay = 0;
-
-                if (eBlock) {
-                    const factor = parseFloat(eBlock.getFieldValue('VEHICLE'));
-                    const dist = parseFloat(eBlock.getFieldValue('DIST'));
-                    totalDebt = factor * dist;
-                }
-
-                if (fBlock) {
-                    const absorption = parseFloat(fBlock.getFieldValue('TREE'));
-                    const area = parseFloat(fBlock.getFieldValue('AREA'));
-                    // Karena perjalanan itu sekali pakai, sedangkan pohon itu tahunan, 
-                    // kita asumsikan ini serapan pohon per hari agar skalanya masuk akal.
-                    totalPay = (absorption * area) / 365; 
-                }
-
-                return { debt: totalDebt, pay: totalPay };
+        // --- 2. LOGIKA PERHITUNGAN ---
+        function solveDebt(block) {
+            let total = 0;
+            let item = block.getInputTargetBlock('ITEMS');
+            while (item) {
+                total += (parseFloat(item.getFieldValue('MODE')) * parseFloat(item.getFieldValue('DIST')));
+                item = item.getNextBlock();
             }
-            return null;
+            return total;
         }
 
-        function updateUI(data) {
-            const debtEl = document.getElementById('debt-val');
-            const payEl = document.getElementById('pay-val');
-            const balEl = document.getElementById('balance-val');
-            const box = document.getElementById('balance-box');
-            const status = document.getElementById('status-text');
-            const icon = document.getElementById('visual-icon');
-
-            const debt = data ? data.debt : 0;
-            const pay = data ? data.pay : 0;
-            const balance = pay - debt;
-
-            debtEl.innerText = debt.toFixed(2) + " kg CO2";
-            payEl.innerText = pay.toFixed(2) + " kg CO2";
-            balEl.innerText = Math.abs(balance).toFixed(2) + " kg CO2";
-
-            if (balance < 0) {
-                box.className = "debt";
-                status.innerText = "HUTANG PADA BUMI 📉";
-                icon.innerText = "🌫️";
-            } else if (balance > 0) {
-                box.className = "paid";
-                status.innerText = "LUNAS & HIJAU! 🌳";
-                icon.innerText = "🍃";
-            } else {
-                box.className = "";
-                status.innerText = "MULAI HITUNG";
-                icon.innerText = "🌍";
+        function solvePay(block) {
+            let total = 0;
+            let item = block.getInputTargetBlock('ITEMS');
+            while (item) {
+                total += (parseFloat(item.getFieldValue('TREE')) * parseFloat(item.getFieldValue('AREA')) / 365);
+                item = item.getNextBlock();
             }
+            return total;
         }
 
-        workspace.addChangeListener(() => {
-            const blocks = workspace.getAllBlocks(false);
-            let data = null;
-            blocks.forEach(b => {
-                if (b.type === 'carbon_balance') data = calculateCarbon(b);
+        function updateUI() {
+            let finalDebt = 0;
+            let finalPay = 0;
+
+            workspace.getAllBlocks(false).forEach(block => {
+                if (!block.getParent()) {
+                    if (block.type === 'debt_container') finalDebt = solveDebt(block);
+                    if (block.type === 'pay_container') finalPay = solvePay(block);
+                    if (block.type === 'carbon_balance_nested') {
+                        const d = block.getInputTargetBlock('DEBT');
+                        const p = block.getInputTargetBlock('PAY');
+                        if (d) finalDebt = solveDebt(d);
+                        if (p) finalPay = solvePay(p);
+                    }
+                }
             });
-            updateUI(data);
-        });
 
-        function resetApp() { workspace.clear(); updateUI(null); }
+            document.getElementById('debt-out').innerText = finalDebt.toFixed(2) + " kg CO2";
+            document.getElementById('pay-out').innerText = finalPay.toFixed(2) + " kg CO2";
+            
+            const balance = finalPay - finalDebt;
+            const balOut = document.getElementById('balance-out');
+            const style = document.getElementById('balance-style');
+            const status = document.getElementById('status-txt');
+
+            balOut.innerText = Math.abs(balance).toFixed(2) + " kg CO2";
+            
+            if (balance < -0.1) {
+                style.style.borderColor = "#e74c3c";
+                status.innerText = "HUTANG (BELUM LUNAS) 📉";
+            } else if (balance > 0.1) {
+                style.style.borderColor = "#2ecc71";
+                status.innerText = "LUNAS & SURPLUS! 🌳";
+            } else {
+                style.style.borderColor = "#3498db";
+                status.innerText = "STABIL / NETRAL";
+            }
+        }
+
+        workspace.addChangeListener(updateUI);
     </script>
 </body>
 </html>
