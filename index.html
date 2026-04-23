@@ -2,12 +2,12 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Si Yo: Penjaga Jejak Karbon</title>
+    <title>Si Yo: Tabungan Karbon Kita</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f7f4; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f7f4; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
         #main-container { display: flex; gap: 20px; width: 100%; max-width: 1300px; margin-top: 10px; }
-        #blocklyDiv { height: 700px; flex: 2; border: 3px solid #27ae60; border-radius: 12px; background: white; }
+        #blocklyDiv { height: 700px; flex: 2; border: 3px solid #27ae60; border-radius: 12px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         #sidebar { flex: 1; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 8px solid #27ae60; }
         
         .monitor { margin-bottom: 15px; padding: 15px; border-radius: 10px; border: 2px solid #eee; }
@@ -17,68 +17,69 @@
         
         .val { font-size: 1.5em; display: block; margin-top: 5px; }
         button { background: #34495e; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        h2 { color: #2c3e50; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
-    <h2>🛡️ Si Yo: Kalkulator Jejak Karbon</h2>
-    <p>Gunakan mekanisme sarang (nested) untuk menghitung hutang dan pelunasan karbon!</p>
+    <h2>🛡️ Si Yo: Tabungan Karbon Kita</h2>
+    <p>Ayo bandingkan pengeluaran emisi dengan tabungan pohonmu!</p>
 
     <div id="main-container">
         <div id="blocklyDiv"></div>
 
         <div id="sidebar">
             <div class="monitor debt-box">
-                <small>💨 TOTAL HUTANG (EMISI)</small>
+                <small>💨 TOTAL PENGELUARAN (EMISI)</small>
                 <b id="debt-out" class="val" style="color: #c53030;">0 kg CO2</b>
             </div>
             
             <div class="monitor pay-box">
-                <small>🌳 TOTAL PELUNASAN (TANAM)</small>
+                <small>🌳 TOTAL TABUNGAN (POHON)</small>
                 <b id="pay-out" class="val" style="color: #2f855a;">0 kg CO2</b>
             </div>
 
             <div class="monitor total-box" id="balance-style">
-                <small>⚖️ NERACA KARBON</small>
+                <small>⚖️ SALDO KARBON SI YO</small>
                 <b id="balance-out" class="val">0 kg CO2</b>
-                <span id="status-txt" style="font-size: 0.6em; display: block; margin-top: 5px;">STABIL</span>
+                <span id="status-txt" style="font-size: 0.6em; display: block; margin-top: 5px;">SALDO SEIMBANG</span>
             </div>
 
-            <button onclick="workspace.clear(); updateUI();">Bersihkan Papan</button>
+            <button onclick="workspace.clear(); updateUI();">Reset Kalkulator</button>
         </div>
     </div>
 
     <xml id="toolbox" style="display: none">
-        <category name="1. Hutang (Emisi)" colour="0">
+        <category name="1. Pengeluaran (Emisi)" colour="0">
             <block type="transport_item"></block>
             <block type="debt_container"></block>
         </category>
-        <category name="2. Pelunasan (Tanam)" colour="120">
+        <category name="2. Tabungan (Tanam)" colour="120">
             <block type="tree_item"></block>
             <block type="pay_container"></block>
         </category>
-        <category name="3. Neraca" colour="210">
+        <category name="3. Cek Saldo" colour="210">
             <block type="carbon_balance_nested"></block>
         </category>
     </xml>
 
     <script>
-        // --- 1. DEFINISI BLOK NESTED ---
+        // --- 1. DEFINISI BLOK ---
         Blockly.defineBlocksWithJsonArray([
           // Item Transportasi
           {
             "type": "transport_item",
             "message0": "%1 Jarak: %2 km",
             "args0": [
-              { "type": "field_dropdown", "name": "MODE", "options": [["✈️ Pesawat", "0.25"], ["🚗 Mobil", "0.18"], ["🚆 Kereta", "0.04"]] },
+              { "type": "field_dropdown", "name": "MODE", "options": [["✈️ Pesawat", "0.25"], ["🚗 Mobil", "0.18"], ["🚆 Kereta", "0.04"], ["🔌 Mobil Listrik", "0.05"]] },
               { "type": "field_number", "name": "DIST", "value": 100 }
             ],
             "previousStatement": null, "nextStatement": null, "colour": 0
           },
-          // Wadah Hutang
+          // Wadah Pengeluaran
           {
             "type": "debt_container",
-            "message0": "Hutang Karbon Perjalanan: %1 %2",
+            "message0": "Catatan Pengeluaran Emisi: %1 %2",
             "args0": [{ "type": "input_dummy" }, { "type": "input_statement", "name": "ITEMS" }],
             "output": "DebtData", "colour": 0
           },
@@ -87,22 +88,22 @@
             "type": "tree_item",
             "message0": "Tanam %1 Luas: %2 Ha",
             "args0": [
-              { "type": "field_dropdown", "name": "TREE", "options": [["🌳 Munggur", "28000"], ["🌽 Jagung", "4000"], ["🌴 Bakau", "25000"]] },
+              { "type": "field_dropdown", "name": "TREE", "options": [["🌳 Munggur", "28000"], ["🌽 Jagung", "4000"], ["🌴 Bakau", "25000"], ["🫚 Lengkuas/Kunyit", "2000"]] },
               { "type": "field_number", "name": "AREA", "value": 1 }
             ],
             "previousStatement": null, "nextStatement": null, "colour": 120
           },
-          // Wadah Pelunasan
+          // Wadah Tabungan
           {
             "type": "pay_container",
-            "message0": "Pelunasan Tanam Pohon: %1 %2",
+            "message0": "Buku Tabungan Pohon: %1 %2",
             "args0": [{ "type": "input_dummy" }, { "type": "input_statement", "name": "ITEMS" }],
             "output": "PayData", "colour": 120
           },
-          // Blok Neraca (Kalkulator Utama)
+          // Blok Cek Saldo
           {
             "type": "carbon_balance_nested",
-            "message0": "Neraca Si Yo %1 Hutang: %2 %3 Pelunasan: %4",
+            "message0": "Cek Saldo Si Yo %1 Pengeluaran: %2 %3 Tabungan: %4",
             "args0": [
               { "type": "input_dummy" },
               { "type": "input_value", "name": "DEBT", "check": "DebtData" },
@@ -165,13 +166,16 @@
             
             if (balance < -0.1) {
                 style.style.borderColor = "#e74c3c";
-                status.innerText = "HUTANG (BELUM LUNAS) 📉";
+                status.innerText = "SALDO MINUS (BOROS EMISI) 📉";
+                balOut.style.color = "#c53030";
             } else if (balance > 0.1) {
                 style.style.borderColor = "#2ecc71";
-                status.innerText = "LUNAS & SURPLUS! 🌳";
+                status.innerText = "SALDO POSITIF (PAHLAWAN BUMI) 🌳";
+                balOut.style.color = "#2f855a";
             } else {
                 style.style.borderColor = "#3498db";
-                status.innerText = "STABIL / NETRAL";
+                status.innerText = "SALDO SEIMBANG";
+                balOut.style.color = "#2c3e50";
             }
         }
 
