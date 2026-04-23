@@ -2,28 +2,51 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Si Yo: Tabungan Karbon Kita</title>
+    <title>Si Yo: Tabungan Karbon Taman Numerasi</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f7f4; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        #main-container { display: flex; gap: 20px; width: 100%; max-width: 1300px; margin-top: 10px; }
-        #blocklyDiv { height: 700px; flex: 2; border: 3px solid #27ae60; border-radius: 12px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        #sidebar { flex: 1; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 8px solid #27ae60; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f7f4; display: flex; flex-direction: column; align-items: center; padding: 0; margin: 0; }
         
+        /* --- 1. Header (Tempat Logo) --- */
+        #header { width: 100%; max-width: 1400px; padding: 10px 20px; display: flex; align-items: center; justify-content: flex-start; box-sizing: border-box; background: rgba(255,255,255,0.7); border-radius: 0 0 12px 12px; margin-bottom: 5px;}
+        .logo { height: 80px; width: auto; } /* Sesuaikan tinggi logo BBGTK */
+
+        /* --- 2. Title Area (Tempat Maskot & Judul) --- */
+        #title-container { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; margin-top: 10px; background: white; padding: 10px 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .maskot { height: 100px; width: auto; } /* Sesuaikan tinggi maskot Si Yo */
+        #title-text-area { display: flex; flex-direction: column; text-align: left; }
+        h2 { color: #2c3e50; margin: 0; }
+        .sub-h2 { color: #7f8c8d; margin-top: 2px; margin-bottom: 0; font-size: 0.9em; }
+
+        /* --- 3. Main Content Layout --- */
+        #main-container { display: flex; gap: 20px; width: 100%; max-width: 1300px; margin-top: 10px; margin-bottom: 20px; }
+        #blocklyDiv { height: 650px; flex: 2; border: 3px solid #27ae60; border-radius: 12px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        #sidebar { flex: 1; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 8px solid #27ae60; display: flex; flex-direction: column; }
+        
+        /* Dashboard Styling */
         .monitor { margin-bottom: 15px; padding: 15px; border-radius: 10px; border: 2px solid #eee; }
         .debt-box { border-color: #e74c3c; background: #fff5f5; }
         .pay-box { border-color: #2ecc71; background: #f0fff4; }
-        .total-box { border-color: #3498db; background: #ebf8ff; font-size: 1.3em; font-weight: bold; }
+        .total-box { border-color: #3498db; background: #ebf8ff; font-size: 1.3em; font-weight: bold; margin-bottom: 0; }
         
         .val { font-size: 1.5em; display: block; margin-top: 5px; }
-        button { background: #34495e; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        h2 { color: #2c3e50; margin-bottom: 5px; }
+        button { background: #34495e; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: auto; }
+        button:hover { background: #2c3e50; }
     </style>
 </head>
 <body>
 
-    <h2>🛡️ Si Yo: Tabungan Karbon Kita</h2>
-    <p>Ayo bandingkan pengeluaran emisi dengan tabungan pohonmu!</p>
+    <div id="header">
+        <img src="logo-bbgtk.png" alt="Logo BBGTK D.I. Yogyakarta" class="logo">
+    </div>
+
+    <div id="title-container">
+        <img src="maskot-siyo.png" alt="Si Yo, Maskot Numerasi" class="maskot">
+        <div id="title-text-area">
+            <h2>🛡️ Si Yo: Tabungan Karbon Kita</h2>
+            <p class="sub-h2">Taman Numerasi BBGTK D.I. Yogyakarta</p>
+        </div>
+    </div>
 
     <div id="main-container">
         <div id="blocklyDiv"></div>
@@ -64,7 +87,7 @@
     </xml>
 
     <script>
-        // --- 1. DEFINISI BLOK ---
+        // --- 1. DEFINISI BLOK NESTED ---
         Blockly.defineBlocksWithJsonArray([
           // Item Transportasi
           {
